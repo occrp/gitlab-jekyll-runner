@@ -1,4 +1,4 @@
-FROM sameersbn/gitlab-ci-multi-runner:0.6.2
+FROM sameersbn/gitlab-ci-multi-runner:1.1.4-7
 MAINTAINER Michał "rysiek" Woźniak <rysiek@occrp.org>
 
 #
@@ -18,11 +18,18 @@ RUN apt-get update && \
         libc6-dev \
         linux-libc-dev \
         libc6 \
-        ruby2.0 \
-        ruby2.0-dev \
+        software-properties-common \
         nodejs && \
     rm -rf /var/lib/apt/lists/*
 
+# need a newer Ruby
+RUN add-apt-repository ppa:brightbox/ruby-ng && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ruby2.4 \
+        ruby2.4-dev && \
+    rm -rf /var/lib/apt/lists/*
+    
 # we might need to install some packages, but doing this in the entrypoint doesn't make any sense
 ARG INSTALL_PACKAGES=
 RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
@@ -33,6 +40,6 @@ RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
     fi
     
 # Jekyll
-RUN gem2.0 install jekyll bundle
+RUN gem2.4 install jekyll bundle
 
 VOLUME /output
