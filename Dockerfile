@@ -8,6 +8,13 @@ MAINTAINER Michał "rysiek" Woźniak <rysiek@occrp.org>
 # environment
 ENV DEBIAN_FRONTEND=noninteractive 
 
+# need en_US.UTF-8 locale for SASS to handle UTF-8 characters in CSS
+# http://code.dblock.org/2011/06/09/compass-invalid-us-ascii-character-xe2.html
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+RUN locale-gen en_US.UTF-8
+
 # Ruby and requirements
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
