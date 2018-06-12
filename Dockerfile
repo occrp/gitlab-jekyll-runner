@@ -27,8 +27,13 @@ RUN apt-get update && \
         linux-libc-dev \
         libc6 \
         software-properties-common \
-        nodejs && \
+        nodejs \
+        npm && \
     rm -rf /var/lib/apt/lists/*
+
+# npm's self-signed CA is no more
+# https://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
+RUN npm config set ca=""
 
 # need a newer Ruby
 RUN add-apt-repository ppa:brightbox/ruby-ng && \
