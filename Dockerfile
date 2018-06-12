@@ -33,7 +33,7 @@ RUN apt-get update && \
 
 # npm's self-signed CA is no more
 # https://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
-RUN npm config set ca=""
+ENV NPM_CONFIG_CA=""
 
 # need a newer Ruby
 RUN add-apt-repository ppa:brightbox/ruby-ng && \
