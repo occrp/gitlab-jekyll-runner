@@ -21,6 +21,7 @@ RUN apt-get update && \
         ca-certificates \
         make \
         gcc \
+        g++ \
         libc-dev-bin \
         libc6-dev \
         linux-libc-dev \
