@@ -15,6 +15,27 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 RUN locale-gen en_US.UTF-8
 
+# adding repository keys
+ARG ADD_REPOSITORY_KEYS=
+RUN if [ "$ADD_REPOSITORY_KEYS" != "" ]; then \
+        DEBIAN_FRONTEND=noninteractive apt-get -q update && \
+        apt-get -q -y --no-install-recommends install \
+            gnupg \
+            apt-transport-https \
+            ca-certificates \
+            lsb-release && \
+        apt-get -q clean && \
+        apt-get -q -y autoremove && \
+        rm -rf /var/lib/apt/lists/* && \
+        echo "$ADD_REPOSITORY_KEYS" | sed -e 's/^[[:space:]]*//' | apt-key add - ; \
+    fi
+    
+# adding repositories
+ARG ADD_REPOSITORIES=
+RUN if [ "$ADD_REPOSITORIES" != "" ]; then \
+        echo "$ADD_REPOSITORIES" | sed -e 's/^[[:space:]]*//' > /etc/apt/sources.list.d/added-from-docker-build-arg.list ; \
+    fi
+
 # Ruby and requirements
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
