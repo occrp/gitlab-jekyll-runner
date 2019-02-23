@@ -85,6 +85,6 @@ RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
     
 # Jekyll-related requirements
 RUN gem2.4 install jekyll bundler:'<2'
-RUN /usr/bin/npm install bower
+RUN /usr/bin/npm install bower -g
 
 VOLUME /output
