@@ -15,10 +15,8 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 RUN locale-gen en_US.UTF-8
 
-# adding repository keys
-ARG ADD_REPOSITORY_KEYS=
-RUN if [ "$ADD_REPOSITORY_KEYS" != "" ]; then \
-        DEBIAN_FRONTEND=noninteractive apt-get -q update && \
+# we need this to be able to handle the node repo setup
+RUN DEBIAN_FRONTEND=noninteractive apt-get -q update && \
         apt-get -q -y --no-install-recommends install \
             gnupg \
             apt-transport-https \
@@ -26,14 +24,25 @@ RUN if [ "$ADD_REPOSITORY_KEYS" != "" ]; then \
             lsb-release && \
         apt-get -q clean && \
         apt-get -q -y autoremove && \
-        rm -rf /var/lib/apt/lists/* && \
+        rm -rf /var/lib/apt/lists/*
+
+# add the node repo key
+COPY node-repo-key.asc /tmp/node-repo-key.asc
+RUN apt-key add /tmp/node-repo-key.asc
+
+# add the node repo
+RUN echo -e "deb https://deb.nodesource.com/node_8.x trusty main\ndeb-src https://deb.nodesource.com/node_8.x trusty main\n" > /etc/apt/sources.list.d/node_8.x.list
+
+# adding additional repository keys from build args
+ARG ADD_REPOSITORY_KEYS=
+RUN if [ "$ADD_REPOSITORY_KEYS" != "" ]; then \
         echo "$ADD_REPOSITORY_KEYS" | sed -e 's/^[[:space:]]*//' | apt-key add - ; \
     fi
     
-# adding repositories
+# adding repositories from build args
 ARG ADD_REPOSITORIES=
 RUN if [ "$ADD_REPOSITORIES" != "" ]; then \
-        echo "$ADD_REPOSITORIES" | sed -e 's/^[[:space:]]*//' > /etc/apt/sources.list.d/added-from-docker-build-arg.list ; \
+        echo -e "$ADD_REPOSITORIES" | sed -e 's/^[[:space:]]*//' > /etc/apt/sources.list.d/added-from-docker-build-arg.list ; \
     fi
 
 # Ruby and requirements
@@ -48,8 +57,9 @@ RUN apt-get update && \
         linux-libc-dev \
         libc6 \
         software-properties-common \
-        nodejs \
-        npm && \
+        rsync \
+        imagemagick \
+        nodejs && \
     rm -rf /var/lib/apt/lists/*
 
 # npm's self-signed CA is no more
