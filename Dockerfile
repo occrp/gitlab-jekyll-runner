@@ -83,7 +83,8 @@ RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
         rm -rf /var/lib/apt/lists/* ; \
     fi
     
-# Jekyll
-RUN gem2.4 install jekyll bundle
+# Jekyll-related requirements
+RUN gem2.4 install jekyll bundle -v '< 2'
+RUN /usr/bin/npm install bower
 
 VOLUME /output
