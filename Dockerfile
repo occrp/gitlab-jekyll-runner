@@ -31,7 +31,7 @@ COPY node-repo-key.asc /tmp/node-repo-key.asc
 RUN apt-key add /tmp/node-repo-key.asc
 
 # add the node repo
-RUN echo -e "deb https://deb.nodesource.com/node_8.x trusty main\ndeb-src https://deb.nodesource.com/node_8.x trusty main\n" > /etc/apt/sources.list.d/node_8.x.list
+RUN echo "deb https://deb.nodesource.com/node_8.x trusty main\ndeb-src https://deb.nodesource.com/node_8.x trusty main\n" > /etc/apt/sources.list.d/node_8.x.list
 
 # adding additional repository keys from build args
 ARG ADD_REPOSITORY_KEYS=
@@ -42,7 +42,7 @@ RUN if [ "$ADD_REPOSITORY_KEYS" != "" ]; then \
 # adding repositories from build args
 ARG ADD_REPOSITORIES=
 RUN if [ "$ADD_REPOSITORIES" != "" ]; then \
-        echo -e "$ADD_REPOSITORIES" | sed -e 's/^[[:space:]]*//' > /etc/apt/sources.list.d/added-from-docker-build-arg.list ; \
+        echo "$ADD_REPOSITORIES" | sed -e 's/^[[:space:]]*//' > /etc/apt/sources.list.d/added-from-docker-build-arg.list ; \
     fi
 
 # Ruby and requirements
