@@ -1,4 +1,4 @@
-FROM sameersbn/gitlab-ci-multi-runner:1.1.4-7
+FROM gitlab/gitlab-runner:ubuntu
 MAINTAINER Michał "rysiek" Woźniak <rysiek@occrp.org>
 
 #
@@ -8,12 +8,13 @@ MAINTAINER Michał "rysiek" Woźniak <rysiek@occrp.org>
 # environment
 ENV DEBIAN_FRONTEND=noninteractive 
 
-# need en_US.UTF-8 locale for SASS to handle UTF-8 characters in CSS
-# http://code.dblock.org/2011/06/09/compass-invalid-us-ascii-character-xe2.html
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
-RUN locale-gen en_US.UTF-8
+# uid and gid of the gitlab-runner user
+ARG GITLAB_RUNNER_UID=999
+ARG GITLAB_RUNNER_GID=999
+
+# and let's modify the group and the user
+RUN groupmod --gid ${GITLAB_RUNNER_GID} gitlab-runner \
+    && usermod --uid "${GITLAB_RUNNER_UID}" gitlab-runner
 
 # we need this to be able to handle the node repo setup
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q update && \
@@ -21,17 +22,25 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q update && \
             gnupg \
             apt-transport-https \
             ca-certificates \
+            locales \
             lsb-release && \
         apt-get -q clean && \
         apt-get -q -y autoremove && \
         rm -rf /var/lib/apt/lists/*
+
+# need en_US.UTF-8 locale for SASS to handle UTF-8 characters in CSS
+# http://code.dblock.org/2011/06/09/compass-invalid-us-ascii-character-xe2.html
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+RUN locale-gen en_US.UTF-8
 
 # add the node repo key
 COPY node-repo-key.asc /tmp/node-repo-key.asc
 RUN apt-key add /tmp/node-repo-key.asc
 
 # add the node repo
-RUN echo "deb https://deb.nodesource.com/node_8.x trusty main\ndeb-src https://deb.nodesource.com/node_8.x trusty main\n" > /etc/apt/sources.list.d/node_8.x.list
+RUN echo "deb https://deb.nodesource.com/node_8.x xenial main\ndeb-src https://deb.nodesource.com/node_8.x xenial main\n" > /etc/apt/sources.list.d/node_8.x.list
 
 # adding additional repository keys from build args
 ARG ADD_REPOSITORY_KEYS=
@@ -48,7 +57,6 @@ RUN if [ "$ADD_REPOSITORIES" != "" ]; then \
 # Ruby and requirements
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        ca-certificates \
         make \
         gcc \
         g++ \
@@ -87,4 +95,4 @@ RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
 RUN gem2.4 install jekyll bundler:'<2'
 RUN /usr/bin/npm install bower -g
 
-VOLUME /output
+VOLUME ["/etc/gitlab-runner", "/home/gitlab-runner", "/output"]
