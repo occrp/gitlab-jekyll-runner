@@ -78,8 +78,8 @@ RUN npm config -g set ca ""
 RUN add-apt-repository ppa:brightbox/ruby-ng && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        ruby2.4 \
-        ruby2.4-dev && \
+        ruby2.7 \
+        ruby2.7-dev && \
     rm -rf /var/lib/apt/lists/*
     
 # we might need to install some packages, but doing this in the entrypoint doesn't make any sense
@@ -92,7 +92,7 @@ RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
     fi
     
 # Jekyll-related requirements
-RUN gem2.4 install jekyll bundler:'<2'
+RUN gem2.7 install jekyll bundler:'<2'
 RUN /usr/bin/npm install bower -g
 
 VOLUME ["/etc/gitlab-runner", "/home/gitlab-runner", "/output"]
