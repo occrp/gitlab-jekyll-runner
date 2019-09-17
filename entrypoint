@@ -35,6 +35,10 @@ if [[ ! -e ${CONFIG_FILE} ]]; then
     # register the runner
     su gitlab-runner -c \
       "gitlab-runner register --non-interactive --config '${CONFIG_FILE}' --url '${CI_SERVER_URL}' --registration-token '${RUNNER_TOKEN}' --description '${RUNNER_DESCRIPTION}' --executor '${RUNNER_EXECUTOR}'"
+    if [ $? != 0 ]; then
+      echo "    ERROR: failed to register the runner!"
+      exit 2
+    fi
   else
     echo "    ERROR: no config file and no configuration vars!"
     exit 1
