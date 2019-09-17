@@ -95,4 +95,8 @@ RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
 RUN gem2.4 install jekyll:'<4' bundler:'<2'
 RUN /usr/bin/npm install bower -g
 
+# copy in the entrypoint script
+COPY entrypoint /
+RUN chmod +x /entrypoint
+
 VOLUME ["/etc/gitlab-runner", "/home/gitlab-runner", "/output"]
