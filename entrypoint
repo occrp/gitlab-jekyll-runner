@@ -10,6 +10,12 @@
 
 # gitlab-runner data directory
 DATA_DIR="/etc/gitlab-runner"
+
+# fix permissions on the home directory
+echo
+echo "+-- changing /home/gitlab-runner owner to: $( getent passwd gitlab-runner | cut -d ':' -f 3,4 )"
+chown -R "$( getent passwd gitlab-runner | cut -d ':' -f 3,4 )" /home/gitlab-runner
+
 CONFIG_FILE=${CONFIG_FILE:-$DATA_DIR/config.toml}
 # custom certificate authority path
 CA_CERTIFICATES_PATH=${CA_CERTIFICATES_PATH:-$DATA_DIR/certs/ca.crt}
