@@ -47,7 +47,7 @@ ARG ADD_REPOSITORY_KEYS=
 RUN if [ "$ADD_REPOSITORY_KEYS" != "" ]; then \
         echo "$ADD_REPOSITORY_KEYS" | sed -e 's/^[[:space:]]*//' | apt-key add - ; \
     fi
-    
+
 # adding repositories from build args
 ARG ADD_REPOSITORIES=
 RUN if [ "$ADD_REPOSITORIES" != "" ]; then \
@@ -78,10 +78,10 @@ RUN npm config -g set ca ""
 RUN add-apt-repository ppa:brightbox/ruby-ng && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        ruby2.4 \
-        ruby2.4-dev && \
+        ruby2.6 \
+        ruby2.6-dev && \
     rm -rf /var/lib/apt/lists/*
-    
+
 # we might need to install some packages, but doing this in the entrypoint doesn't make any sense
 ARG INSTALL_PACKAGES=
 RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
@@ -90,9 +90,9 @@ RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
             --no-install-recommends && \
         rm -rf /var/lib/apt/lists/* ; \
     fi
-    
+
 # Jekyll-related requirements
-RUN gem2.4 install jekyll:'<4' bundler:'<2'
+RUN gem2.6 install jekyll:'<4' bundler:'<2'
 RUN /usr/bin/npm install bower -g
 
 # copy in the entrypoint script
