@@ -12,6 +12,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 ARG GITLAB_RUNNER_UID=999
 ARG GITLAB_RUNNER_GID=999
 
+# open files limit needs to be bumped
+COPY open-file-limit.conf /etc/security/limits.d/
+
 # and let's modify the group and the user
 RUN groupmod --gid ${GITLAB_RUNNER_GID} gitlab-runner \
     && usermod --uid "${GITLAB_RUNNER_UID}" gitlab-runner
